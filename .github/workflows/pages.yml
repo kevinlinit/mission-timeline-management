@@ -45,3 +45,6 @@ jobs:
     steps:
       - id: deploy
         uses: actions/deploy-pages@v4
+      - if: failure()
+        run: |
+          echo "::error title=GitHub Pages isn't on for this repository::Turn it on in Settings → Pages → Build and deployment → Source: GitHub Actions, then re-run this workflow. A private repository needs a paid GitHub plan for Pages; on the free plan, make the repository public or host the site elsewhere (see README, Deploy)."

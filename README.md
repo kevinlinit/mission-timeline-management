@@ -52,9 +52,13 @@ Add `http://127.0.0.1:5173` to the Google web client's **Authorized JavaScript o
 
 The `pages` workflow tests the site, writes `config.js` and publishes it to GitHub Pages on every push to `main`.
 
-1. **Settings → Pages → Source: GitHub Actions.** (GitHub Pages for a private repository needs a paid plan; otherwise make the repository public or host the folder anywhere static.)
+1. **Settings → Pages → Source: GitHub Actions**, then re-run the latest `pages` workflow. Until Pages is on, the deploy job fails with "Ensure GitHub Pages has been enabled". GitHub Pages for a **private** repository needs a paid plan (Pro, Team or Enterprise); on the free plan the Pages settings only offer an upgrade. Then either make the repository public (nothing secret lives here: access is enforced by the server) or use another static host.
 2. **Settings → Secrets and variables → Actions → Variables**: `SERVER_URL` = the backend's address. Optionally `API_URL` for published missions (default: the backend's static API on GitHub Pages).
 3. In Google Cloud, add the console's address (e.g. `https://kevinlinit.github.io`) to the web client's **Authorized JavaScript origins**.
+
+### Another static host
+
+Cloudflare Pages, Netlify and Vercel all serve private repositories for free. Connect the repository, leave the build command empty and the output folder as the repository root, and put the backend's address in `config.js` (commit it, since those hosts don't run the workflow).
 
 ## The shared core
 
