@@ -1,0 +1,13 @@
+{
+  "name": "mission-timeline-management",
+  "version": "1.0.0",
+  "description": "The studio console for Mission Timeline: customer cases, the pipeline, itineraries and staff.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node scripts/serve.mjs",
+    "test": "node --test test/*.test.mjs",
+    "sync-core": "node scripts/sync-core.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

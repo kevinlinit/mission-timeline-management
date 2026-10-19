@@ -1,0 +1,47 @@
+# Test, then publish the console to GitHub Pages with config.js pointing at the backend.
+# Set the repository variables SERVER_URL (required) and API_URL (optional) under
+# Settings → Secrets and variables → Actions → Variables, and Settings → Pages → Source: GitHub Actions.
+name: pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test
+      - name: Is core/ the same as the backend's?
+        run: npm run sync-core -- --check || echo "::warning::core/ is behind mission-timeline's src/core. Run npm run sync-core and commit."
+      - name: Write config.js
+        env:
+          SERVER_URL: ${{ vars.SERVER_URL }}
+          API_URL: ${{ vars.API_URL }}
+        run: |
+          mkdir -p _site && cp -r index.html studio.js editor.js studio.css config.js css core _site/
+          [ -n "$SERVER_URL" ] && sed -i "s|^export const SERVER_URL = .*|export const SERVER_URL = \"$SERVER_URL\";|" _site/config.js || echo "::warning::SERVER_URL isn't set: the console will ask for it."
+          [ -n "$API_URL" ] && sed -i "s|^export const API_URL = .*|export const API_URL = \"$API_URL\";|" _site/config.js || true
+          touch _site/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
